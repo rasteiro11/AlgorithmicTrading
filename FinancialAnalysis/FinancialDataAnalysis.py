@@ -1,3 +1,6 @@
+from re import S
+from matplotlib import font_manager
+from matplotlib.widgets import SpanSelector
 import pandas as pd
 from pandas.core.frame import DataFrame 
 import yfinance as yf
@@ -271,3 +274,157 @@ plt.figure(figsize=(12,8))
 sns.set(font_scale=1.0)
 sns.heatmap(ret.corr(), cmap = "RdYlGn", annot = True, vmin = -0.5, vmax = 0.6, center = 0)
 plt.show()
+
+# simple returns vs log returns 
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame(index=[2016, 2017, 2018], data=[100, 50, 95], columns=["Price"])
+
+simple_returns = df.pct_change().dropna()
+
+simple_returns.mean()
+
+np.log(df / df.shift(1))
+
+log_returns = np.log(df / df.shift(1))
+
+log_returns.mean()
+
+actual_val = 100 * np.exp(2 * log_returns.mean())
+
+# importing financial data from excel
+import pandas as pd
+
+pd.read_excel("./SP500.xls")
+
+pd.read_excel("./SP500.xls", parse_dates=["Date"], index_col=0)
+
+SP500 = pd.read_excel("./SP500.xls", parse_dates=["Date"], index_col=0, usecols="A:G")
+
+last_col_index = len(SP500.columns)
+last_cols = SP500.columns[last_col_index-2:last_col_index]
+SP500 = SP500.drop(last_cols, axis=1)
+
+SP500.info()
+
+SP500.to_csv("SP500.csv")
+
+SP500.to_excel("SP500_red.xls")
+
+# simple moving averages (SMA) with rolling()
+import pandas as pd
+import matplotlib.pyplot as plt
+plt.style.use("seaborn")
+
+SP500 = pd.read_csv("SP500.csv", parse_dates=["Date"], index_col=["Date"])
+
+SP500.head()
+
+SP500.tail()
+
+SP500.info()
+
+SP500 = SP500.Close.to_frame()
+
+SP500.head()
+
+SP500.plot(figsize=(12, 8), fontsize=15)
+plt.legend(loc="upper left", fontsize=15)
+plt.show()
+
+SP500 = SP500.loc["2008-12-31":"2018-12-31"].copy()
+
+SP500.rolling(10)
+
+SP500.head(15)
+
+SP500.rolling(10).mean()
+
+SP500.rolling(10).median()
+
+SP500.rolling(10).max()
+
+# momentum trading strategies and SMA's
+SP500.head()
+SP500.tail()
+
+SP500["SMA50"] = SP500.rolling(window=50, min_periods=50).mean()
+
+SP500.plot(figsize=(12, 8), fontsize=15)
+plt.legend(loc="upper left", fontsize=15)
+plt.show()
+
+SP500["SMA200"] = SP500.Close.rolling(window=200).mean()
+SP500.plot(figsize=(12, 8), fontsize=15)
+plt.legend(loc="upper left", fontsize=15)
+plt.show()
+
+SP500.tail()
+
+SP500.tail()
+
+SP500.plot(figsize=(12, 8), fontsize=15)
+plt.legend(loc="upper left", fontsize=15)
+plt.show()
+
+# exponentially weighted moving averages (EWMA)
+import pandas as pd
+import matplotlib.pyplot as plt
+plt.style.use("seaborn")
+
+SP500 = pd.read_csv("SP500.csv", parse_dates=["Date"], index_col=["Date"], usecols=["Date", "Close"])
+
+SP500.head()
+
+SP500 = SP500.loc["2008-12-31":"2018-12-31"].copy()
+
+SP500.Close.rolling(10).mean()
+
+SP500.Close.ewm(span=10, min_periods=10).mean()
+
+SP500["SMA"] = SP500.Close.rolling(100).mean()
+SP500["EMA"] = SP500.Close.ewm(span=100, min_periods=100).mean()
+print(SP500)
+
+SP500.iloc[:, -2:].plot(figsize=(15, 10), fontsize=15)
+plt.legend(fontsize=15)
+plt.show()
+
+# merging time series
+import pandas as pd
+stocks = pd.read_csv("stocks.csv", header=[0, 1], index_col=[0], parse_dates=[0]).Close
+
+stocks.head()
+
+aapl = stocks.loc["2010-01-01":"2014-12-31", "AAPL"].to_frame()
+aapl.head()
+
+ba = stocks.loc["2012-01-01":"2016-12-31", "BA"].to_frame()
+ba.head()
+
+aapl["BA"] = ba.BA
+
+aapl.head()
+
+aapl.tail()
+
+aapl.dropna()
+
+ba.reindex(aapl.index).dropna()
+
+dis = stocks.loc["2010-01-01": "2016-12-31", "DIS"].resample("W-Fri").last().to_frame()
+dis.head()
+
+aapl.head()
+
+aapl["DIS"] = dis.DIS
+
+aapl.head(10)
+
+dis.reindex(aapl.index)
+
+dis["AAPL"] = aapl.AAPL
+
+dis.head()
+

@@ -161,4 +161,113 @@ print(ann_var_Returns)
 
 print(ret.std() * np.sqrt(252))
 
+# financial tiem series - return and risk
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt 
 
+stocks = pd.read_csv("./stocks.csv", header=[0, 1], index_col=[0],parse_dates=[0])
+
+stocks.head()
+
+close = stocks.loc[:, "Close"].copy()
+
+close.pct_change().dropna()
+
+ret = close.pct_change().dropna()
+
+ret.head()
+
+summary = ret.describe().T.loc[:, ["mean", "std"]]
+
+print(summary)
+
+summary["mean"] = summary["mean"]*252
+summary["std"] = summary["std"]*np.sqrt(252)
+
+summary.plot.scatter(x="std", y="mean", figsize=(12, 8), s = 50,fontsize=15)
+for i in summary.index:
+    plt.annotate(i ,xy=(summary.loc[i, "std"]+0.002, summary.loc[i, "mean"]+ 0.002), size=15)
+
+plt.xlabel("ann. Risk(std)", fontsize=15)
+plt.ylabel("ann. Return", fontsize=15)
+plt.title("Risk/Return", fontsize=20)
+plt.show()
+
+# financial time series - covariance and correlation
+ret.head()
+
+ret.cov()
+
+ret.corr()
+
+import seaborn as sns
+
+plt.figure(figsize=(12, 8))
+sns.set(font_scale=1.4)
+sns.heatmap(ret.corr(), cmap="Reds", annot=True, annot_kws={"size": 15}, vmax=0.6)
+plt.show()
+
+# Exercise 2 
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+plt.style.use("seaborn")
+
+# load us stocks parsing dates, setting headers and tiemstamp indices
+stocks = pd.read_csv("us_stocks.csv", parse_dates=[0], index_col=0, header=[0, 1])
+
+stocks.head()
+
+# get Adj Close stock prices from "2015-12-31" to "2018-12-31"
+stocks = stocks.loc["2015-12-31":"2018-12-31", "Adj Close"]
+
+stocks.head()
+
+stocks.info()
+
+# show adjusted close prices
+stocks.plot(figsize=(12, 8))
+plt.show()
+
+# normalize stock prices with base 100
+first_row = stocks.iloc[0, :]
+stocks.div(first_row).mul(100).plot(figsize=(12, 8))
+plt.show()
+
+# resampling stock prices to monthly rate
+stocks_m = stocks.resample("M").last()
+
+stocks_m.head()
+
+# calculate monthly returns
+ret = stocks_m.pct_change().dropna()
+
+ret.head()
+
+# calculate mean and std of monthly returns
+summary = ret.describe().T.loc[:, ["mean", "std"]]
+
+# annualize mean and std 
+summary["mean"] = summary["mean"]*12
+summary["std"] = summary["std"]*np.sqrt(12)
+
+summary.head()
+summary.plot(kind = "scatter", x = "std", y = "mean", figsize = (12, 8), s = 50, fontsize = 15, xlim = (0.1, 0.3), ylim = (0, 0.25))
+
+for i in summary.index:
+    plt.annotate(i, xy=(summary.loc[i, "std"]+0.002, summary.loc[i, "mean"]+0.002), size = 15)
+
+plt.xlabel("ann. Risk(std)", fontsize = 15)
+plt.ylabel("ann. Return", fontsize = 15)
+plt.title("Risk/Return", fontsize = 20)
+plt.show()
+
+# get stock correlation between stock returns
+ret.corr()
+
+plt.figure(figsize=(12,8))
+sns.set(font_scale=1.0)
+sns.heatmap(ret.corr(), cmap = "RdYlGn", annot = True, vmin = -0.5, vmax = 0.6, center = 0)
+plt.show()

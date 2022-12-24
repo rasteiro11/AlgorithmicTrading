@@ -1,7 +1,9 @@
 from re import S
+from time import clock_settime
 from matplotlib import font_manager
 from matplotlib.widgets import SpanSelector
 import pandas as pd
+from pandas.core.dtypes.dtypes import PeriodDtype
 from pandas.core.frame import DataFrame 
 import yfinance as yf
 import matplotlib.pyplot as plt 
@@ -427,4 +429,102 @@ dis.reindex(aapl.index)
 dis["AAPL"] = aapl.AAPL
 
 dis.head()
+
+# important datetime index attributes and methods 
+import pandas as pd
+
+close = pd.read_csv("stocks.csv", header=[0, 1], index_col=[0], parse_dates=[0]).Close
+
+close.index
+
+close.index.day
+close.index.month
+close.index.year
+
+close.index.day_name()
+close.index.month_name()
+close.index.year
+
+close.index.quarter
+
+close.index.days_in_month
+
+close.index.week
+
+close.index.weekofyear
+
+close.index.is_month_end
+
+
+close["Day"] = stocks.index.day_name()
+close["Quarter"] = stocks.index.quarter
+
+close.head()
+
+# filling na values with bfill ffill and interpolation
+close.head()
+
+close.tail()
+
+all_days = pd.date_range(start="2009-12-31", end="2019-02-06", freq="D")
+print(all_days)
+
+close = close.reindex(all_days)
+
+close.head(20)
+
+close.Day = close.index.weekday
+close.Quarter = close.index.quarter
+
+close.fillna(method="bfill")
+
+close.fillna(method="ffill")
+
+temp = pd.read_csv("./temp.csv", parse_dates=["datetime"], index_col="datetime")
+temp.head()
+
+temp = temp.resample("30 Min").mean()
+temp.head()
+
+temp.interpolate()
+
+# timezones and converting
+import pandas as pd
+
+ge = pd.read_csv("GE_prices.csv", parse_dates=["date"], index_col="date")
+
+ge.head()
+
+ge.info()
+
+ge.index
+
+# will return None 
+# print(ge.index.tz)
+
+ge.tz_localize("UTC")
+
+ge =  ge.tz_localize("America/New_York")
+
+ge.head()
+
+ge_la = ge.tz_convert("America/Los_Angeles")
+
+ge_la.head()
+
+ge.head()
+
+comb = pd.concat([ge, ge_la], axis=1)
+
+comb.head()
+
+comb["NY_time"] = comb.index.tz_convert("America/New_York")
+comb["LA_time"] = comb.index.tz_convert("America/Los_Angeles")
+
+comb.head()
+
+import pytz
+
+pytz.common_timezones
+
 

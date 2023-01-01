@@ -90,6 +90,7 @@ class SMABacktester():
         else:
             title = "{} | SMA_S = {} | SMA_L = {}".format(self.symbol, self.SMA_S, self.SMA_L)
             self.results[["creturns", "cstrategy"]].plot(title=title, figsize=(12, 8))
+            plt.show()
     
     def optimize_parameters(self, SMA_S_range, SMA_L_range):
         ''' Finds the optimal strategy (global maximum) given the SMA parameter ranges.
